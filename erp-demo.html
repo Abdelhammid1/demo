@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>نظام الإدارة — نسخة تجريبية تفاعلية</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#eef2f1;--card:#fff;--ink:#12302f;--mut:#5d7472;--line:#d5dfdd;--acc:#c8891b;--top:#12302f;--ok:#1f8a5b;--bad:#c0392b;--soft:#e3ece9}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1a19;--card:#172726;--ink:#e6f0ee;--mut:#8fa9a6;--line:#27403e;--top:#0a1413;--soft:#1e3432}}
+:root[data-theme="dark"]{--bg:#0e1a19;--card:#172726;--ink:#e6f0ee;--mut:#8fa9a6;--line:#27403e;--top:#0a1413;--soft:#1e3432}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Tajawal,Tahoma,Arial,sans-serif;font-size:15px}
+header{background:var(--top);color:#fff;padding:12px 16px 0;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+header h1{font-size:17px;margin:0 0 8px;font-weight:800}
+header small{font-weight:400;opacity:.65;margin-inline-start:8px}
+nav{display:flex;gap:4px;overflow-x:auto}
+nav button{background:none;border:0;color:#b7cfcb;font:inherit;padding:9px 14px;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+nav button.on{color:#fff;border-color:var(--acc);font-weight:700}
+main{max-width:1100px;margin:0 auto;padding:16px}
+h2{font-size:20px;margin:4px 0 14px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+h3{font-size:16px;margin:20px 0 8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.k{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
+.k b{display:block;font-size:22px;font-weight:800;margin-top:2px}
+.k span{color:var(--mut);font-size:13px}
+.k.hl{border-color:var(--acc)}
+.tw{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px}
+table{width:100%;border-collapse:collapse;min-width:520px}
+th,td{padding:9px 12px;text-align:start;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--mut);font-weight:500;font-size:13px;background:var(--soft)}
+tr:last-child td{border:0}
+.b{background:var(--acc);color:#1b1200;border:0;border-radius:8px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer}
+.b.g{background:var(--soft);color:var(--ink)}
+.b.s{padding:4px 10px;font-size:13px}
+.b:focus-visible,nav button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.pos{color:var(--ok);font-weight:700}.neg{color:var(--bad);font-weight:700}
+.tag{background:#f6d9d5;color:#8a2016;border-radius:6px;padding:2px 8px;font-size:12px}
+.lnk{color:var(--ink);font-weight:700;cursor:pointer;text-decoration:underline;background:none;border:0;font:inherit;padding:0}
+.act{list-style:none;margin:0;padding:0;background:var(--card);border:1px solid var(--line);border-radius:10px}
+.act li{padding:9px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}
+.act li:last-child{border:0}.act time{color:var(--mut);font-size:12px;white-space:nowrap}
+.mb{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}
+.md{background:var(--card);border-radius:12px;padding:18px;width:100%;max-width:400px;max-height:90vh;overflow:auto}
+.md h3{margin:0 0 10px}
+label{display:block;margin-bottom:10px;font-size:13px;color:var(--mut)}
+input,select{display:block;width:100%;margin-top:4px;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+.er{color:var(--bad);min-height:18px;margin-bottom:6px;font-size:13px}
+.nt{background:var(--soft);padding:8px 10px;border-radius:8px;font-size:13px;margin:0 0 10px}
+#toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ok);color:#fff;padding:10px 18px;border-radius:8px;z-index:30;display:none;max-width:90%;text-align:center}
+#toast.bad{background:var(--bad)}
+.back{margin-bottom:8px}
+</style>
+</head>
+<body>
+<header><h1>نظام الإدارة<small>نسخة تجريبية — البيانات تُعاد عند تحديث الصفحة</small></h1>
+<nav id="nav"></nav></header>
+<main id="main"></main>
+<div id="modal"></div><div id="toast"></div>
+<script>
+const N=n=>(+n||0).toLocaleString('en-US',{maximumFractionDigits:2}),iso=new Date().toISOString().slice(0,10),dm=s=>s.split('-').reverse().join('/'),pos=n=>Number.isFinite(n)&&n>0,$=id=>document.getElementById(id);
+const SEED=()=>({
+employees:[[1,'محمد حسن',5500,400],[2,'سارة القحطاني',7000,600],[3,'خالد العتيبي',4800,300],[4,'نورة الشمري',6200,500],[5,'يوسف إبراهيم',4200,250],[6,'فهد الحربي',8000,800]].map(a=>({id:a[0],name:a[1],basic:a[2],allow:a[3]})),
+deductions:[{id:1,empId:3,type:'تأخير',amount:200,reason:'تأخر متكرر',date:iso}],
+advances:[{id:1,empId:1,amount:500,date:iso,notes:'سلفة شهرية'}],
+products:[[1,'مياه معدنية',100,1.5,2.25],[2,'أرز بسمتي 20 كجم',20,95,120],[3,'زيت طبخ',30,14,18],[4,'سكر 10 كجم',25,38,46],[5,'شاي 100 ظرف',40,9,12]].map(a=>({id:a[0],name:a[1],min:a[2],buy:a[3],sell:a[4]})),
+movements:[[1,1,'in',400],[2,2,'in',60],[3,3,'in',15],[4,4,'in',80],[5,5,'in',120]].map(a=>({id:a[0],productId:a[1],type:a[2],qty:a[3],date:iso})),
+customers:[[1,'مؤسسة النور','0501112233','تبوك'],[2,'شركة الأفق','0554445566','الرياض'],[3,'مطعم الواحة','0567778899','تبوك'],[4,'مؤسسة الرياض للتجارة','0532223344','الرياض']].map(a=>({id:a[0],name:a[1],phone:a[2],address:a[3]})),
+customerTransactions:[[1,1,'sale',5000],[2,2,'sale',12000],[3,2,'payment',4000],[4,3,'sale',7500],[5,4,'sale',9000],[6,4,'payment',3000]].map(a=>({id:a[0],custId:a[1],type:a[2],amount:a[3],date:iso,notes:a[2]=='sale'?'فاتورة آجلة':'دفعة'})),
+activities:[{id:1,t:'09:00',msg:'تم تحميل بيانات التجربة'}]});
+let S=SEED(),V={p:'dash'},uid=1000;
+const emp=id=>S.employees.find(e=>e.id==id),prod=id=>S.products.find(p=>p.id==id),cus=id=>S.customers.find(c=>c.id==id);
+const sum=(a,f)=>a.reduce((s,x)=>s+f(x),0);
+const ded=e=>sum(S.deductions.filter(d=>d.empId==e.id),d=>d.amount),adv=e=>sum(S.advances.filter(d=>d.empId==e.id),d=>d.amount),net=e=>e.basic+e.allow-ded(e)-adv(e);
+const qty=p=>sum(S.movements.filter(m=>m.productId==p.id),m=>m.type=='in'?m.qty:-m.qty),val=p=>qty(p)*p.buy;
+const bal=c=>sum(S.customerTransactions.filter(t=>t.custId==c.id),t=>t.type=='sale'?t.amount:-t.amount);
+function act(msg){S.activities.unshift({id:++uid,t:new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),msg});toast(msg)}
+function toast(m,bad){const t=$('toast');t.textContent=m;t.className=bad?'bad':'';t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',2800)}
+function go(p,id){V={p,id};scrollTo(0,0);render()}
+function closeM(){$('modal').innerHTML=''}
+function openForm(title,fields,save,note){
+$('modal').innerHTML=`<div class="mb" onclick="if(event.target===this)closeM()"><div class="md" role="dialog"><h3>${title}</h3>${note?`<p class="nt">${note}</p>`:''}${fields.map(f=>`<label>${f.l}${f.t=='select'?`<select id="f_${f.k}">${f.o.map(o=>`<option value="${o[0]}" ${o[0]==f.v?'selected':''}>${o[1]}</option>`).join('')}</select>`:`<input id="f_${f.k}" type="${f.t||'text'}" value="${f.v??''}" ${f.t=='number'?'min="0" step="any" inputmode="decimal"':''}>`}</label>`).join('')}<div class="er" id="er"></div><div class="row"><button class="b" id="sv">حفظ</button><button class="b g" onclick="closeM()">إلغاء</button></div></div></div>`;
+$('sv').onclick=()=>{const v={};fields.forEach(f=>{const x=$('f_'+f.k).value;v[f.k]=f.t=='number'?parseFloat(x):x});const e=save(v);if(e)$('er').textContent=e;else{closeM();render()}}}
+function ask(msg,fn){$('modal').innerHTML=`<div class="mb"><div class="md"><h3>${msg}</h3><div class="row"><button class="b" id="yes">تأكيد</button><button class="b g" onclick="closeM()">إلغاء</button></div></div></div>`;$('yes').onclick=()=>{closeM();fn()}}
+const eOpts=()=>S.employees.map(e=>[e.id,e.name]),pOpts=()=>S.products.map(p=>[p.id,p.name]),cOpts=()=>S.customers.map(c=>[c.id,c.name]);
+/* ---- actions ---- */
+function addEmp(){openForm('موظف جديد',[{k:'name',l:'اسم الموظف'},{k:'basic',l:'الراتب الأساسي',t:'number'},{k:'allow',l:'البدلات',t:'number',v:0}],v=>{if(!v.name.trim())return'أدخل اسم الموظف';if(!pos(v.basic))return'أدخل راتباً أساسياً صحيحاً';S.employees.push({id:++uid,name:v.name.trim(),basic:v.basic,allow:v.allow||0});act('تم إضافة الموظف '+v.name.trim())})}
+function editEmp(id){const e=emp(id);openForm('تعديل الراتب — '+e.name,[{k:'basic',l:'الراتب الأساسي',t:'number',v:e.basic},{k:'allow',l:'البدلات',t:'number',v:e.allow}],v=>{if(!pos(v.basic))return'أدخل راتباً صحيحاً';e.basic=v.basic;e.allow=v.allow||0;act('تم تعديل راتب الموظف '+e.name)})}
+function addDed(id){openForm('إضافة خصم',[{k:'e',l:'الموظف',t:'select',o:eOpts(),v:id},{k:'type',l:'نوع الخصم',t:'select',o:['تأخير','غياب','مخالفة','أخرى'].map(x=>[x,x])},{k:'a',l:'قيمة الخصم',t:'number'},{k:'r',l:'السبب'},{k:'d',l:'التاريخ',t:'date',v:iso}],v=>{if(!pos(v.a))return'أدخل قيمة خصم صحيحة';S.deductions.push({id:++uid,empId:+v.e,type:v.type,amount:v.a,reason:v.r,date:v.d});toast('تم تسجيل الخصم بنجاح');act(`تم تسجيل خصم ${N(v.a)} ريال على الموظف ${emp(v.e).name}`)})}
+function addAdv(id){openForm('تسجيل سلفة',[{k:'e',l:'الموظف',t:'select',o:eOpts(),v:id},{k:'a',l:'المبلغ',t:'number'},{k:'d',l:'التاريخ',t:'date',v:iso},{k:'n',l:'ملاحظات'}],v=>{if(!pos(v.a))return'أدخل مبلغاً صحيحاً';S.advances.push({id:++uid,empId:+v.e,amount:v.a,date:v.d,notes:v.n});act(`تم تسجيل سلفة بقيمة ${N(v.a)} ريال للموظف ${emp(v.e).name}`)})}
+function addProd(){openForm('منتج جديد',[{k:'name',l:'اسم المنتج'},{k:'q',l:'الكمية الافتتاحية',t:'number',v:0},{k:'min',l:'الحد الأدنى',t:'number',v:10},{k:'buy',l:'سعر الشراء',t:'number'},{k:'sell',l:'سعر البيع',t:'number'}],v=>{if(!v.name.trim())return'أدخل اسم المنتج';if(!pos(v.buy)||!pos(v.sell))return'أدخل سعر الشراء والبيع';const p={id:++uid,name:v.name.trim(),min:v.min||0,buy:v.buy,sell:v.sell};S.products.push(p);if(v.q>0)S.movements.push({id:++uid,productId:p.id,type:'in',qty:v.q,date:iso});act('تم إضافة المنتج '+p.name)})}
+function move(type,id){const inn=type=='in';openForm(inn?'تسجيل وارد':'تسجيل صرف',[{k:'p',l:'المنتج',t:'select',o:pOpts(),v:id},{k:'q',l:'الكمية',t:'number'},{k:'d',l:'التاريخ',t:'date',v:iso}],v=>{if(!pos(v.q))return'أدخل كمية صحيحة';const p=prod(v.p);if(!inn&&v.q>qty(p))return'الكمية المطلوبة أكبر من الرصيد المتاح.';S.movements.push({id:++uid,productId:p.id,type,qty:v.q,date:v.d});act(inn?`تم تسجيل وارد ${N(v.q)} وحدة من ${p.name}`:`تم تسجيل صرف ${N(v.q)} وحدة من ${p.name}`)})}
+function addCus(){openForm('عميل جديد',[{k:'name',l:'اسم العميل'},{k:'ph',l:'الهاتف'},{k:'ad',l:'العنوان'}],v=>{if(!v.name.trim())return'أدخل اسم العميل';S.customers.push({id:++uid,name:v.name.trim(),phone:v.ph,address:v.ad});act('تم إضافة العميل '+v.name.trim())})}
+function addSale(id){openForm('فاتورة آجلة',[{k:'c',l:'العميل',t:'select',o:cOpts(),v:id},{k:'a',l:'قيمة الفاتورة',t:'number'},{k:'d',l:'التاريخ',t:'date',v:iso}],v=>{if(!pos(v.a))return'أدخل قيمة صحيحة';S.customerTransactions.push({id:++uid,custId:+v.c,type:'sale',amount:v.a,date:v.d,notes:'فاتورة آجلة'});act(`تم تسجيل فاتورة آجلة بقيمة ${N(v.a)} ريال للعميل ${cus(v.c).name}`)})}
+function addPay(id){const c0=id&&cus(id);openForm('تسجيل دفعة',[{k:'c',l:'العميل',t:'select',o:cOpts(),v:id},{k:'a',l:'المبلغ المدفوع',t:'number'},{k:'d',l:'التاريخ',t:'date',v:iso}],v=>{if(!pos(v.a))return'أدخل مبلغاً صحيحاً';const c=cus(v.c),b=bal(c);if(v.a>b)return`المبلغ أكبر من الرصيد المستحق (${N(b)} ريال)`;S.customerTransactions.push({id:++uid,custId:c.id,type:'payment',amount:v.a,date:v.d,notes:'دفعة من العميل'});act(`تم تسجيل دفعة بقيمة ${N(v.a)} ريال من ${c.name} (الرصيد السابق ${N(b)} ← المتبقي ${N(b-v.a)})`)},c0?`الرصيد الحالي: ${N(bal(c0))} ريال`:'')}
+function reset(){ask('هل تريد إعادة النظام إلى بيانات التجربة الأصلية؟',()=>{S=SEED();V={p:'dash'};render();toast('تمت إعادة بيانات التجربة')})}
+/* ---- views ---- */
+const K=(l,v,h)=>`<div class="k ${h?'hl':''}"><span>${l}</span><b>${v}</b></div>`;
+const tbl=(h,rows)=>`<div class="tw"><table><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr>${rows.join('')||`<tr><td colspan="${h.length}">لا توجد بيانات</td></tr>`}</table></div>`;
+const link=(t,p,id)=>`<button class="lnk" onclick="go('${p}',${id})">${t}</button>`;
+const VIEWS={
+dash(){const E=S.employees,tp=sum(S.products,val),low=S.products.filter(p=>qty(p)<=p.min).length;
+return`<h2>لوحة التحكم</h2><div class="grid">${K('الموظفون',E.length+' موظف')}${K('صافي الرواتب',N(sum(E,net))+' ريال')}${K('إجمالي الخصومات',N(sum(S.deductions,d=>d.amount))+' ريال')}${K('إجمالي السلف',N(sum(S.advances,a=>a.amount))+' ريال')}${K('عدد المنتجات',S.products.length)}${K('قيمة المخزون',N(tp)+' ريال')}${K('منتجات تحت الحد الأدنى',low)}${K('العملاء',S.customers.length)}${K('المستحق على العملاء',N(sum(S.customers,bal))+' ريال',1)}</div><h3>آخر العمليات</h3><ul class="act">${S.activities.slice(0,8).map(a=>`<li><span>${a.msg}</span><time>${a.t}</time></li>`).join('')}</ul>`},
+emp(){return`<h2>الموظفون والرواتب <button class="b" onclick="addEmp()">+ موظف جديد</button></h2>`+tbl(['الموظف','الأساسي','البدلات','الخصومات','السلف','صافي المرتب','إجراءات'],S.employees.map(e=>`<tr><td>${link(e.name,'empD',e.id)}</td><td>${N(e.basic)}</td><td>${N(e.allow)}</td><td>${N(ded(e))}</td><td>${N(adv(e))}</td><td><b>${N(net(e))}</b></td><td class="row"><button class="b s g" onclick="addDed(${e.id})">إضافة خصم</button><button class="b s g" onclick="addAdv(${e.id})">سلفة</button></td></tr>`))+`<p style="color:var(--mut);font-size:13px">صافي المرتب = الأساسي + البدلات − الخصومات − السلف</p>`},
+empD(){const e=emp(V.id);return`<button class="lnk back" onclick="go('emp')">← الموظفون</button><h2>${e.name}<span class="row"><button class="b s g" onclick="editEmp(${e.id})">تعديل الراتب</button><button class="b s" onclick="addDed(${e.id})">إضافة خصم</button><button class="b s" onclick="addAdv(${e.id})">تسجيل سلفة</button></span></h2><div class="grid">${K('الأساسي',N(e.basic))}${K('البدلات',N(e.allow))}${K('الخصومات',N(ded(e)))}${K('السلف',N(adv(e)))}${K('صافي المرتب',N(net(e))+' ريال',1)}</div><h3>سجل الخصومات</h3>`+tbl(['التاريخ','النوع','القيمة','السبب'],S.deductions.filter(d=>d.empId==e.id).map(d=>`<tr><td>${dm(d.date)}</td><td>${d.type}</td><td class="neg">−${N(d.amount)}</td><td>${d.reason||'-'}</td></tr>`))+`<h3>سجل السلف</h3>`+tbl(['التاريخ','المبلغ','ملاحظات'],S.advances.filter(d=>d.empId==e.id).map(d=>`<tr><td>${dm(d.date)}</td><td class="neg">−${N(d.amount)}</td><td>${d.notes||'-'}</td></tr>`))},
+inv(){return`<h2>المخزون <span class="row"><button class="b s g" onclick="addProd()">+ منتج</button><button class="b s" onclick="move('in')">وارد</button><button class="b s" onclick="move('out')">صرف</button></span></h2><div class="grid" style="margin-bottom:12px">${K('إجمالي الكميات',N(sum(S.products,qty)))}${K('قيمة المخزون',N(sum(S.products,val))+' ريال',1)}</div>`+tbl(['المنتج','الكمية','الحد الأدنى','الشراء','البيع','قيمة المخزون','',''],S.products.map(p=>`<tr><td>${p.name}</td><td><b>${N(qty(p))}</b></td><td>${N(p.min)}</td><td>${N(p.buy)}</td><td>${N(p.sell)}</td><td>${N(val(p))}</td><td>${qty(p)<=p.min?'<span class="tag">منخفض</span>':''}</td><td class="row"><button class="b s g" onclick="move('in',${p.id})">وارد</button><button class="b s g" onclick="move('out',${p.id})">صرف</button></td></tr>`))+`<h3>حركة المخزون</h3>`+tbl(['التاريخ','المنتج','النوع','الكمية'],S.movements.slice().reverse().slice(0,12).map(m=>`<tr><td>${dm(m.date)}</td><td>${prod(m.productId).name}</td><td>${m.type=='in'?'وارد':'صرف'}</td><td class="${m.type=='in'?'pos':'neg'}">${m.type=='in'?'+':'−'}${N(m.qty)}</td></tr>`))},
+cust(){return`<h2>العملاء والحسابات <span class="row"><button class="b s g" onclick="addCus()">+ عميل</button><button class="b s g" onclick="addSale()">فاتورة آجلة</button><button class="b s" onclick="addPay()">تسجيل دفعة</button></span></h2><div class="grid" style="margin-bottom:12px">${K('عدد العملاء',S.customers.length)}${K('إجمالي المستحق',N(sum(S.customers,bal))+' ريال',1)}</div>`+tbl(['العميل','الهاتف','العنوان','الرصيد المستحق'],S.customers.map(c=>`<tr><td>${link(c.name,'cusD',c.id)}</td><td>${c.phone||'-'}</td><td>${c.address||'-'}</td><td><b class="${bal(c)>0?'neg':'pos'}">${N(bal(c))} ريال</b></td></tr>`))},
+cusD(){const c=cus(V.id);let r=0;const T=S.customerTransactions.filter(t=>t.custId==c.id),sales=sum(T.filter(t=>t.type=='sale'),t=>t.amount);
+return`<button class="lnk back" onclick="go('cust')">← العملاء</button><h2>${c.name}<span class="row"><button class="b s g" onclick="addSale(${c.id})">فاتورة آجلة</button><button class="b s" onclick="addPay(${c.id})">تسجيل دفعة</button></span></h2><div class="grid">${K('إجمالي المبيعات الآجلة',N(sales)+' ريال')}${K('إجمالي المدفوع',N(sales-bal(c))+' ريال')}${K('الرصيد الحالي',N(bal(c))+' ريال',1)}</div><h3>كشف الحساب</h3>`+tbl(['التاريخ','البيان','المبلغ','الرصيد'],T.map(t=>{r+=t.type=='sale'?t.amount:-t.amount;return`<tr><td>${dm(t.date)}</td><td>${t.notes}</td><td class="${t.type=='sale'?'neg':'pos'}">${t.type=='sale'?'+':'−'}${N(t.amount)}</td><td>${N(r)}</td></tr>`}))},
+set(){return`<h2>الإعدادات</h2><div class="k"><p style="margin-top:0">إعادة كل البيانات إلى نسخة التجربة الأصلية قبل عرضها على عميل جديد.</p><button class="b" onclick="reset()">إعادة بيانات التجربة</button></div>`}};
+const TABS=[['dash','لوحة التحكم'],['emp','الموظفون','empD'],['inv','المخزون'],['cust','العملاء','cusD'],['set','الإعدادات']];
+function render(){$('nav').innerHTML=TABS.map(t=>`<button class="${V.p==t[0]||V.p==t[2]?'on':''}" onclick="go('${t[0]}')">${t[1]}</button>`).join('');$('main').innerHTML=VIEWS[V.p]()}
+render();
+</script>
+</body>
+</html>
